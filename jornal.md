@@ -8,3 +8,46 @@ Install dependencies:
             pip install pandas numpy scikit-learn fastapi uvicorn joblib
             then save them: pip freeze > requirements.txt
 
+This is the solution of my problem:- 
+I have use global python .drienv but o have to use my local .venv 
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % which python
+        /Users/ayushpandey/.direnv/python-3.9/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % source .venv/bin/activate
+        which python
+        /Users/ayushpandey/.direnv/python-3.9/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % ls -a
+
+        .                       .DS_Store               data                    requirements.txt
+        ..                      .venv                   models                  src
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % ls .venv/bin/python
+
+        .venv/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % ./.venv/bin/python -c "import pandas; print('pandas OK')"
+
+        zsh: no such file or directory: ./.venv/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % /.venv/bin/python -c "import pandas; print('pandas OK')" 
+
+        zsh: no such file or directory: /.venv/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % rm -rf .venv
+
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % ls -a
+
+        .                       ..                      .DS_Store               data                    models                  requirements.txt        src
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % python3 -m venv .venv
+
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % ls .venv/bin
+
+        Activate.ps1    activate        activate.csh    activate.fish   pip             pip3            pip3.9          python          python3         python3.9
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % source .venv/bin/activate
+
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % which python
+
+        /Users/ayushpandey/Desktop/UrbanVista/backend/.venv/bin/python
+        (.venv) ayushpandey@ayushs-MacBook-Pro-7 backend % 
+
+SO the most probalmitc thing is path. Then after i take help from my friend Raman Pandey and he told me me to correct the path as i am using "../path/data_unde.py"  but i have to do "data/data_ude.py"
+
+So in data set there is 0,1,9 in features apart from no.of bedroom ans those represents:
+        1 means Yes (The house has this feature).
+        0 means No (The house specifically does not have it).
+        9 means Unknown (The data was missing during the collection).
