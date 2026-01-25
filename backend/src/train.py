@@ -10,6 +10,17 @@ df = pd.read_csv('data/master_data.csv')
 #  removing the rows which have empty values
 df.dropna(inplace=True)
 
+# 1. Remove "Impossible" Houses
+# A room should be at least 300 sq.ft. If not, it's likely an error.
+df = df[df['Area'] / df['No. of Bedrooms'] > 300]
+
+# 2. Filter out very rare BHKs
+# If a BHK type has less than 10 houses, it's better to remove it 
+# so it doesn't confuse the AI.
+bhk_counts = df['No. of Bedrooms'].value_counts()
+valid_bhk = bhk_counts[bhk_counts > 10].index
+df = df[df['No. of Bedrooms'].isin(valid_bhk)]
+
 # Now One-Hot Encoding, with this i will divied the cities and location in 0,1 (False,True)
 df_enco = pd.get_dummies(df, columns=["City", "Location"])
 

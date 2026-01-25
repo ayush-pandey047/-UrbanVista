@@ -82,43 +82,69 @@ with col4:
 
 # --- PREDICTION LOGIC ---
 if st.button("Calculate Market Price"):
-    # 1. Create a template row with all zeros
-    input_row = pd.DataFrame(0, index=[0], columns=model_columns)
-    
-    # 2. Map Numeric/Basic Features
-    input_row['Area'] = area
-    input_row['No. of Bedrooms'] = bhk
-    input_row['Resale'] = 1 if resale == "Yes" else 0
-    
-    # 3. Map One-Hot Encoded City/Location
-    city_col = "City_" + selected_city
-    loc_col = "Location_" + selected_location
-    if city_col in input_row.columns: input_row[city_col] = 1
-    if loc_col in input_row.columns: input_row[loc_col] = 1
-    
-    # 4. Map All Binary Amenities (The checkboxes)
-    # The keys here must match the CSV column names exactly
-    amenities_map = {
-        'Gymnasium': gym, 'SwimmingPool': pool, 'LandscapedGardens': garden,
-        'JoggingTrack': jogging, 'RainWaterHarvesting': rain, 'IndoorGames': indoor,
-        'ShoppingMall': mall, 'Intercom': intercom, 'SportsFacility': sports,
-        'ATM': atm, 'ClubHouse': club, 'School': school, '24X7Security': security,
-        'PowerBackup': power, 'CarParking': parking, 'StaffQuarter': quarter,
-        'Cafeteria': cafe, 'MultipurposeRoom': multi, 'Hospital': hosp,
-        'WashingMachine': wash, 'Gasconnection': gas, 'AC': ac, 'Wifi': wifi,
-        "Children'splayarea": play, 'LiftAvailable': lift, 'BED': bed,
-        'VaastuCompliant': vaastu, 'Microwave': micro, 'GolfCourse': golf,
-        'TV': tv, 'DiningTable': dining, 'Sofa': sofa, 'Wardrobe': wardrobe,
-        'Refrigerator': fridge, 'MaintenanceStaff': staff
-    }
-    
-    for feature, val in amenities_map.items():
-        if feature in input_row.columns:
-            input_row[feature] = 1 if val else 0
 
-    # 5. Predict
-    try:
-        price_prediction = model.predict(input_row)[0]
-        st.success(f"## 💰 Estimated Price: ₹ {round(price_prediction, 2):,}")
-    except Exception as e:
-        st.error(f"Error in prediction: {e}")
+    # --- EDGE CASE CHECKING ---
+    error_found = False
+
+    if area < (bhk * 200): # Rule: A room needs at least 200 sq.ft
+        st.error(f"⚠️ Logic Error: {area} sq.ft is too small for {bhk} BHK. Please check your inputs.")
+        error_found = True
+
+    if area > 10000 and price_prediction < 1000000: # Rule: Huge house can't be super cheap
+        st.warning("📊 Note: This area is exceptionally large. The prediction might be less accurate.")
+
+    # Only run prediction if there are no errors
+    if not error_found:
+        # 1. Create a template row with all zeros
+        input_row = pd.DataFrame(0, index=[0], columns=model_columns)
+        
+        # 2. Map Numeric/Basic Features
+        input_row['Area'] = area
+        input_row['No. of Bedrooms'] = bhk
+        input_row['Resale'] = 1 if resale == "Yes" else 0
+        
+        # 3. Map One-Hot Encoded City/Location
+        city_col = "City_" + selected_city
+        loc_col = "Location_" + selected_location
+        if city_col in input_row.columns: input_row[city_col] = 1
+        if loc_col in input_row.columns: input_row[loc_col] = 1
+        
+        # 4. Map All Binary Amenities (The checkboxes)
+        # The keys here must match the CSV column names exactly
+        amenities_map = {
+            'Gymnasium': gym, 'SwimmingPool': pool, 'LandscapedGardens': garden,
+            'JoggingTrack': jogging, 'RainWaterHarvesting': rain, 'IndoorGames': indoor,
+            'ShoppingMall': mall, 'Intercom': intercom, 'SportsFacility': sports,
+            'ATM': atm, 'ClubHouse': club, 'School': school, '24X7Security': security,
+            'PowerBackup': power, 'CarParking': parking, 'StaffQuarter': quarter,
+            'Cafeteria': cafe, 'MultipurposeRoom': multi, 'Hospital': hosp,
+            'WashingMachine': wash, 'Gasconnection': gas, 'AC': ac, 'Wifi': wifi,
+            "Children'splayarea": play, 'LiftAvailable': lift, 'BED': bed,
+            'VaastuCompliant': vaastu, 'Microwave': micro, 'GolfCourse': golf,
+            'TV': tv, 'DiningTable': dining, 'Sofa': sofa, 'Wardrobe': wardrobe,
+            'Refrigerator': fridge, 'MaintenanceStaff': staff
+        }
+
+        st.subheader(f"📈 Market Trends in {selected_city}")
+
+        # Calculate average price for each BHK in the selected city
+        city_data = df_raw[df_raw['City'] == selected_city]
+        avg_price_bhk = city_data.groupby('No. of Bedrooms')['Price'].mean().reset_index()
+
+        # Rename columns for a nicer chart
+        avg_price_bhk.columns = ['BHK', 'Average Price (₹)']
+
+        # Display a Bar Chart
+        st.bar_chart(data=avg_price_bhk, x='BHK', y='Average Price (₹)')
+        st.write(f"The chart above shows how prices typically rise with BHK in {selected_city}.")
+        
+        for feature, val in amenities_map.items():
+            if feature in input_row.columns:
+                input_row[feature] = 1 if val else 0
+
+        # 5. Predict
+        try:
+            price_prediction = model.predict(input_row)[0]
+            st.success(f"## 💰 Estimated Price: ₹ {round(price_prediction, 2):,}")
+        except Exception as e:
+            st.error(f"Error in prediction: {e}")
