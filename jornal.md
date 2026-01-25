@@ -51,3 +51,8 @@ So in data set there is 0,1,9 in features apart from no.of bedroom ans those rep
         1 means Yes (The house has this feature).
         0 means No (The house specifically does not have it).
         9 means Unknown (The data was missing during the collection).
+
+For training the model i am using 80% to train it and 20% for testing the data.
+after this i am using random forest regessor as it is little bit advance in comparision to linear regission.
+
+{import os  # Standard library to handle folders}
