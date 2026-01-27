@@ -60,15 +60,26 @@ def format_indian_currency(num):
         res = char + res
     return res + "," + last_three
 
-# --- 2. LOAD DATA & AI MODEL ---
+# --- 2. LOAD DATA & AI MODEL (Robust Path Logic) ---
+# Ye code khud detect karega ki 'src' folder kahan hai
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Ye 'src' se ek kadam piche 'backend' folder mein jayega
+backend_dir = os.path.dirname(current_dir)
+
+# Ab hum folders ko system-independent tarike se join karenge
+MODEL_PATH = os.path.join(backend_dir, 'models', 'house_model.pkl')
+COLUMNS_PATH = os.path.join(backend_dir, 'models', 'model_columns.pkl')
+DATA_PATH = os.path.join(backend_dir, 'data', 'master_data.csv')
+
 try:
-    model = joblib.load('models/house_model.pkl')
-    model_columns = joblib.load('models/model_columns.pkl')
-    df_raw = pd.read_csv('data/master_data.csv')
-except:
-    model = joblib.load('../models/house_model.pkl')
-    model_columns = joblib.load('../models/model_columns.pkl')
-    df_raw = pd.read_csv('../data/master_data.csv')
+    model = joblib.load(MODEL_PATH)
+    model_columns = joblib.load(COLUMNS_PATH)
+    df_raw = pd.read_csv(DATA_PATH)
+except Exception as e:
+    st.error(f"Files nahi mili! Check karo: {MODEL_PATH}")
+    st.info("Make sure your GitHub structure has backend/models and backend/data folders.")
+    st.stop()
 
 # --- 3. SIDEBAR: LOCATION & GLOBAL SETTINGS ---
 st.sidebar.header("Location & Currency")

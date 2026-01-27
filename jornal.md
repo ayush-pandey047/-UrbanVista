@@ -59,4 +59,4 @@ after this i am using random forest regessor as it is little bit advance in comp
 
 SOone mew thing i learn is streamlit which help python to write long/ big lines of Javascript/Html/Css code in just one word i use dropdown so it makes dropdiwn function, i used sidebar it makes sidebar. Great functionality i truly like this streamlit I will learn more about this function. 
 
-So run streamlit localy i have to run this code in terminal streamlit run src/app.py  for testing.
+So run streamlit localy i have to run this code in terminal {(streamlit run src/app.py)}  for testing.
